@@ -14,7 +14,7 @@ import unlp.info.bd2.config.AppConfig;
 import unlp.info.bd2.config.HibernateConfiguration;
 import unlp.info.bd2.services.ToursService;
 import unlp.info.bd2.utils.ToursException;
-
+import unlp.info.bd2.model.*;
 import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.*;
