@@ -12,12 +12,9 @@ import org.springframework.test.context.support.AnnotationConfigContextLoader;
 import org.springframework.transaction.annotation.Transactional;
 import unlp.info.bd2.config.AppConfig;
 import unlp.info.bd2.config.HibernateConfiguration;
-import unlp.info.bd2.model.*;
 import unlp.info.bd2.services.ToursService;
 import unlp.info.bd2.utils.ToursException;
 
-import javax.swing.text.html.Option;
-import java.time.LocalDate;
 import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -56,7 +53,10 @@ class ToursApplicationTests {
 	void createAndGetUserTest()  throws ToursException {
 		User user1 = this.toursService.createUser("user1", "1234", "Usuario Uno", "user1@gmail.com", dob1, "000111222333");
 		assertNotNull(user1.getId());
-		assertEquals(user1.getUsername(), "user1");
+		assertEquals("user1", user1.getUsername());
+		assertEquals("Usuario Uno", user1.getName());
+		assertEquals("user1@gmail.com", user1.getEmail());
+		assertEquals(dob1, user1.getBirthdate());
 		DriverUser driverUser1 = this.toursService.createDriverUser("userD", "1234", "Usuario Driver", "userd@gmail.com", dob2, "000111222444", "exp...");
 		assertNotNull(driverUser1.getId());
 		TourGuideUser tourGuideUser1 = this.toursService.createTourGuideUser("userG", "1234", "Usuario TourGuide", "userg@gmail.com", dob2, "000111222555", "edu...");
@@ -65,8 +65,10 @@ class ToursApplicationTests {
 		Optional<User> opUserFromDB = this.toursService.getUserById(user1.getId());
 		assertTrue(opUserFromDB.isPresent());
 		User user = opUserFromDB.get();
-		assertEquals(user.getId(), user1.getId());
-		assertEquals(user.getUsername(), "user1");
+		assertEquals(user1.getId(), user.getId());
+		assertEquals("user1", user.getUsername());
+		assertEquals("Usuario Uno", user.getName());
+		assertEquals("user1@gmail.com", user.getEmail());
 		assertTrue(user.getPurchaseList().isEmpty());
 
 		Optional<User> opUserFromDB2 = this.toursService.getUserByUsername("userD");
@@ -83,17 +85,26 @@ class ToursApplicationTests {
 		User user1 = this.toursService.createUser("user1", "1234", "Usuario Uno", "user1@gmail.com", dob1, "000111222333");
 		DriverUser driverUser = this.toursService.createDriverUser("userD", "1234", "Usuario Driver", "userd@gmail.com", dob2, "000111222444", "exp...");
 
-		assertEquals(user1.getPhoneNumber(), "000111222333");
+		assertEquals("000111222333", user1.getPhoneNumber());
 		user1.setPhoneNumber("000000000000");
 		user1 = this.toursService.updateUser(user1);
-		assertNotEquals(user1.getPhoneNumber(), "000111222333");
-		assertEquals(user1.getPhoneNumber(), "000000000000");
+		assertNotEquals("000111222333", user1.getPhoneNumber());
+		assertEquals("000000000000", user1.getPhoneNumber());
 
-		assertEquals(driverUser.getExpedient(), "exp...");
+		assertEquals("exp...", driverUser.getExpedient());
 		driverUser.setExpedient("nuevo expediente");
 		driverUser = (DriverUser) this.toursService.updateUser(driverUser);
-		assertNotEquals(driverUser.getExpedient(), "exp...");
-		assertEquals(driverUser.getExpedient(), "nuevo expediente");
+		assertNotEquals("exp...", driverUser.getExpedient());
+		assertEquals("nuevo expediente", driverUser.getExpedient());
+
+		user1.setUsername("user2");
+		this.toursService.updateUser(user1);
+		Optional<User> opUserFromDB = this.toursService.getUserByUsername("user2");
+		assertTrue(opUserFromDB.isEmpty());
+		Optional<User> opUnmodifiedUserFromDB = this.toursService.getUserByUsername("user1");
+		assertTrue(opUnmodifiedUserFromDB.isPresent());
+		User unmodifiedUserFromDB = opUnmodifiedUserFromDB.get();
+		assertEquals(unmodifiedUserFromDB.getId(), user1.getId());
 	}
 
 	@Test
@@ -258,12 +269,6 @@ class ToursApplicationTests {
 		this.toursService.deletePurchase(purchase1);
 		Optional<Purchase> purchase = this.toursService.getPurchaseByCode("100");
 		assertFalse(purchase.isPresent());
-		Optional<Service> optionalService = this.toursService.getServiceByNameAndSupplierId("Servicio2", supplier1.getId());
-		assertTrue(optionalService.isPresent());
-		Service service = optionalService.get();
-		//assertEquals(0, service.getItemServiceList().size());
-		// TODO Testear que se hayan borrado los correspondientes items
-		// No funciona porque no se hace el flush de la session.
 	}
 
 	@Test
