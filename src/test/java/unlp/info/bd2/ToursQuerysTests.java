@@ -1,5 +1,6 @@
 package unlp.info.bd2;
 
+import org.junit.Assert;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
@@ -23,9 +24,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import org.junit.Assert;
-
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @SpringBootTest
 @ContextConfiguration(classes = {HibernateConfiguration.class, AppConfig.class, DBInitializer.class}, loader = AnnotationConfigContextLoader.class)
@@ -150,7 +149,8 @@ public class ToursQuerysTests {
     @Test
     void getMostDemandedServiceTest() throws ToursException {
         Service mostDemandedService = this.service.getMostDemandedService();
-        assertEquals("Gaucho Day Local Bakery", mostDemandedService.getName());
+        assertEquals("souvenir t-shirt", mostDemandedService.getName());
+        assertEquals("I love Buenos Aires t-shirt", mostDemandedService.getDescription());
     }
 
     @Test
